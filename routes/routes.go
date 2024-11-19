@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/iagoMAF/API_JOHARI/controller"
+	"github.com/iagoMAF/API_JOHARI/middleware"
 
 	"github.com/joho/godotenv"
 
@@ -25,7 +26,7 @@ func HandleRequest() {
 		port = "8080"
 	}
 
-	// r.Use(middleware.AuthMiddleware())
+	r.Use(middleware.AuthMiddleware())
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
