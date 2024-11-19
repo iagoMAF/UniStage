@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/iagoMAF/API_JOHARI/controller"
+	"github.com/iagoMAF/API_JOHARI/middleware"
 
 	"github.com/joho/godotenv"
 
@@ -25,7 +26,7 @@ func HandleRequest() {
 		port = "8080"
 	}
 
-	// r.Use(middleware.AuthMiddleware())
+	r.Use(middleware.AuthMiddleware())
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -43,6 +44,14 @@ func HandleRequest() {
 	r.PATCH("/empresas/:cnpj", controller.AlteraEmpresa)
 	r.POST("/empresas", controller.CriaEmpresa)
 	r.DELETE("/empresas/:cnpj", controller.DeletaEmpresa)
+
+	//rotas de vagas
+	r.GET("/vagas", controller.ListaVagas)
+	r.GET("/vagas/:id", controller.ExibeVagaPorID)
+	r.GET("/vagas/cnpj/:cnpj", controller.ListaVagasPorCNPJ)
+	r.PATCH("/vagas/:id", controller.AtualizaVaga)
+	r.POST("/vagas", controller.CriaVaga)
+	r.DELETE("/vagas/:id", controller.DeletaVaga)
 
 	r.Run(":" + port)
 }
