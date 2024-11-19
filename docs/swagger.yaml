@@ -1,228 +1,203 @@
 definitions:
-  models.Admin:
-    description: Representa um administrador do sistema
+  models.Empresa:
+    description: Representa uma empresa cadastrada no sistema
     properties:
-      login:
+      area_de_atuacao:
         type: string
-      senha:
-        type: string
-    type: object
-  models.Atleta:
-    description: Representa um atleta com informações básicas.
-    properties:
       ativo:
-        description: Status ativo do atleta
-        type: integer
-      cpf:
-        description: CPF do atleta
+        type: boolean
+      bairro:
         type: string
-      cpf_lider:
-        description: CPF do líder associado
+      cidade:
         type: string
-      createdAt:
-        description: Data de criação
+      cnpj:
         type: string
-      deletedAt:
-        description: Data de exclusão (opcional)
+      data_cadastro:
+        type: string
+      descricao:
         type: string
       email:
-        description: Email do atleta
         type: string
-      equipe:
-        allOf:
-        - $ref: '#/definitions/models.Equipe'
-        description: Relacionamento com o modelo Equipe
-      funcao:
-        description: Função do atleta
+      logradouro:
         type: string
-      id:
-        description: ID do atleta
-        type: integer
-      id_equipe:
-        description: ID da equipe associada
-        type: integer
-      idade:
-        description: Idade do atleta
-        type: integer
-      lider:
-        allOf:
-        - $ref: '#/definitions/models.Lider'
-        description: Relacionamento com o modelo Lider
-      nome:
-        description: Nome do atleta
+      nome_fantasia:
         type: string
-      senha:
-        description: Senha do atleta
+      numero:
         type: string
-      updatedAt:
-        description: Data de atualização
+      razao_social:
+        type: string
+      telefone:
+        type: string
+      uf:
+        type: string
+      website:
         type: string
     type: object
-  models.Equipe:
-    description: Representa uma equipe com informações básicas.
+  models.Usuario:
+    description: Representa um usuário do sistema
     properties:
       ativo:
-        description: Status ativo da equipe
-        type: integer
-      createdAt:
-        description: Data de criação
-        type: string
-      deletedAt:
-        description: Data de exclusão (opcional)
-        type: string
-      id:
-        description: ID da equipe
-        type: integer
-      nome:
-        description: Nome da equipe
-        type: string
-      updatedAt:
-        description: Data de atualização
-        type: string
-    type: object
-  models.Lider:
-    description: Representa um líder com informações básicas.
-    properties:
-      cpf:
-        description: CPF do líder
-        type: string
-      createdAt:
-        description: Data de criação
-        type: string
-      deletedAt:
-        description: Data de exclusão (opcional)
+        type: boolean
+      data_cadastro:
         type: string
       email:
-        description: Email do líder
         type: string
+      empresa_cnpj:
+        description: Chave estrangeira opcional
+        type: string
+      id:
+        type: integer
       nome:
-        description: Nome do líder
         type: string
       senha:
-        description: Senha do líder
         type: string
-      updatedAt:
-        description: Data de atualização
-        type: string
+      tipo_usuario:
+        description: true = ADMIN, false = EMPRESA
+        type: boolean
     type: object
-  models.Pergunta:
-    description: Representa uma pergunta com um conjunto de respostas.
+  models.Vaga:
+    description: Representa uma vaga de emprego ou estágio no sistema
     properties:
-      id:
-        description: ID da pergunta
+      ativo:
+        type: boolean
+      bairro:
+        type: string
+      beneficios:
+        type: string
+      carga_horaria:
+        type: string
+      cidade:
+        type: string
+      conhecimento_dif:
+        type: string
+      data_expiracao:
+        type: string
+      data_publicacao:
+        type: string
+      descricao:
+        type: string
+      empresa_cnpj:
+        description: Chave estrangeira para Empresa
+        type: string
+      estagio_remoto:
+        description: 0 = Presencial, 1 = Remoto, 2 = Híbrido
         type: integer
-      pergunta:
-        description: Texto da pergunta
-        type: string
-      respostas:
-        description: Respostas associadas
-        items:
-          $ref: '#/definitions/models.Resposta'
-        type: array
-    type: object
-  models.Resposta:
-    description: Representa uma resposta associada a uma pergunta.
-    properties:
       id:
-        description: ID da resposta
         type: integer
-      pergunta_id:
-        description: ID da pergunta associada
-        type: integer
-      resposta:
-        description: Texto da resposta
+      logradouro:
         type: string
-    type: object
-  models.Resultado:
-    description: Resultado representa o modelo de um resultado de desempenho com informações
-      do atleta e os dados de resultado
-    properties:
-      cpf:
+      numero:
         type: string
-      data:
+      remuneracao:
         type: string
-      eixo_x:
+      requisitos:
         type: string
-      eixo_y:
+      titulo:
         type: string
-      id:
+      uf:
         type: string
     type: object
 info:
   contact: {}
 paths:
-  /admin:
+  /empresas:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista de todas as empresas cadastradas no sistema
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de empresas
+          schema:
+            items:
+              $ref: '#/definitions/models.Empresa'
+            type: array
+        "201":
+          description: Nenhuma empresa cadastrada
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Erro ao listar empresas
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Lista todas as empresas
+      tags:
+      - Empresas
     post:
       consumes:
       - application/json
-      description: Cadastra um novo administrador no sistema
+      description: Cadastra uma nova empresa no sistema
       parameters:
-      - description: Dados do administrador
+      - description: Dados da empresa
         in: body
-        name: admin
+        name: empresa
         required: true
         schema:
-          $ref: '#/definitions/models.Admin'
+          $ref: '#/definitions/models.Empresa'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Admin'
+            $ref: '#/definitions/models.Empresa'
         "400":
-          description: Falha ao cadastrar administrador
+          description: Falha ao cadastrar empresa
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Falha ao salvar administrador no banco de dados
+          description: Erro ao salvar empresa no banco de dados
           schema:
             additionalProperties: true
             type: object
-      summary: Cria um novo administrador
+      summary: Cria uma nova empresa
       tags:
-      - Administradores
-  /admin/{login}:
+      - Empresas
+  /empresas/{cnpj}:
     delete:
       consumes:
       - application/json
-      description: Remove um administrador do sistema pelo login informado
+      description: Exclui uma empresa do sistema pelo CNPJ
       parameters:
-      - description: Login do administrador
+      - description: CNPJ da empresa
         in: path
-        name: login
+        name: cnpj
         required: true
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: Administrador deletado com sucesso
+          description: Empresa excluída com sucesso
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Administrador não encontrado
+          description: Empresa não encontrada
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Falha ao deletar o administrador
+          description: Erro ao deletar a empresa
           schema:
             additionalProperties: true
             type: object
-      summary: Deleta um administrador por login
+      summary: Deleta uma empresa
       tags:
-      - Administradores
+      - Empresas
     get:
       consumes:
       - application/json
-      description: Busca um administrador pelo login informado
+      description: Busca uma empresa pelo CNPJ informado
       parameters:
-      - description: Login do administrador
+      - description: CNPJ da empresa
         in: path
-        name: login
+        name: cnpj
         required: true
         type: string
       produces:
@@ -231,708 +206,421 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Admin'
+            $ref: '#/definitions/models.Empresa'
         "404":
-          description: Administrador não encontrado
+          description: Empresa não encontrada
           schema:
             additionalProperties: true
             type: object
-      summary: Exibe um administrador por login
+      summary: Exibe uma empresa pelo CNPJ
       tags:
-      - Administradores
-  /admin/{login}/senha:
-    patch:
+      - Empresas
+    put:
       consumes:
       - application/json
-      description: Atualiza a senha de um administrador existente pelo login
+      description: Atualiza as informações de uma empresa no sistema
       parameters:
-      - description: Login do administrador
+      - description: CNPJ da empresa
         in: path
-        name: login
+        name: cnpj
         required: true
         type: string
-      - description: Nova senha
+      - description: Dados atualizados da empresa
         in: body
-        name: senha
+        name: empresa
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/models.Empresa'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Admin'
+            $ref: '#/definitions/models.Empresa'
         "400":
-          description: Dados inválidos para atualização
+          description: Falha ao processar os dados da empresa
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Administrador não encontrado
+          description: Empresa não encontrada
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Falha ao atualizar a senha do administrador
+          description: Erro ao atualizar a empresa
           schema:
             additionalProperties: true
             type: object
-      summary: Atualiza a senha de um administrador
+      summary: Altera os dados de uma empresa existente
       tags:
-      - Administradores
-  /atleta:
+      - Empresas
+  /empresas/nome/{nome}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna os dados de uma empresa com base no nome
+      parameters:
+      - description: Nome da empresa
+        in: path
+        name: nome
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Empresa'
+        "404":
+          description: Empresa não encontrada
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Exibe informações de uma empresa pelo nome
+      tags:
+      - Empresas
+  /usuarios:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista de todos os usuários cadastrados no sistema
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de usuários
+          schema:
+            items:
+              $ref: '#/definitions/models.Usuario'
+            type: array
+        "201":
+          description: Nenhum usuário cadastrado
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Erro ao listar usuários
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Lista todos os usuários
+      tags:
+      - Usuários
     post:
       consumes:
       - application/json
-      description: Cadastra um novo atleta no sistema
+      description: Cadastra um novo usuário no sistema
       parameters:
-      - description: Dados do atleta
+      - description: Dados do usuário
         in: body
-        name: atleta
+        name: usuario
         required: true
         schema:
-          $ref: '#/definitions/models.Atleta'
+          $ref: '#/definitions/models.Usuario'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Atleta'
+            $ref: '#/definitions/models.Usuario'
         "400":
-          description: Falha ao cadastrar atleta
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Cria um novo atleta
-      tags:
-      - Atletas
-  /atleta/{cpf}:
-    get:
-      consumes:
-      - application/json
-      description: Busca um atleta pelo CPF informado
-      parameters:
-      - description: CPF do atleta
-        in: path
-        name: cpf
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Atleta'
-        "404":
-          description: Atleta não encontrado
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Exibe um atleta por CPF
-      tags:
-      - Atletas
-    patch:
-      consumes:
-      - application/json
-      description: Atualiza os dados de um atleta existente pelo CPF
-      parameters:
-      - description: CPF do atleta
-        in: path
-        name: cpf
-        required: true
-        type: string
-      - description: Dados atualizados do atleta
-        in: body
-        name: atleta
-        required: true
-        schema:
-          $ref: '#/definitions/models.Atleta'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Atleta'
-        "400":
-          description: Dados inválidos para atualização
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Atleta não encontrado
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Atualiza um atleta
-      tags:
-      - Atletas
-  /atletas:
-    get:
-      consumes:
-      - application/json
-      description: Retorna uma lista de todos os atletas cadastrados
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Atleta'
-            type: array
-      summary: Exibe todos os atletas
-      tags:
-      - Atletas
-  /atletas/equipe/{id_equipe}:
-    get:
-      consumes:
-      - application/json
-      description: Retorna uma lista de atletas associados à equipe especificada pelo
-        ID
-      parameters:
-      - description: ID da equipe
-        in: path
-        name: id_equipe
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Atleta'
-            type: array
-        "404":
-          description: Nenhum atleta encontrado para a equipe informada
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Exibe todos os atletas associados a uma equipe
-      tags:
-      - Atletas
-  /atletas/lider/{cpf_lider}:
-    get:
-      consumes:
-      - application/json
-      description: Retorna uma lista de atletas associados ao líder especificado pelo
-        CPF
-      parameters:
-      - description: CPF do líder
-        in: path
-        name: cpf_lider
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Atleta'
-            type: array
-        "404":
-          description: Nenhum atleta encontrado para o líder informado
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Exibe todos os atletas associados a um líder
-      tags:
-      - Atletas
-  /equipe:
-    post:
-      consumes:
-      - application/json
-      description: Cadastra uma nova equipe no sistema
-      parameters:
-      - description: Dados da equipe
-        in: body
-        name: equipe
-        required: true
-        schema:
-          $ref: '#/definitions/models.Equipe'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Equipe'
-        "400":
-          description: Falha ao cadastrar equipe
+          description: Falha ao cadastrar usuário
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Falha ao salvar equipe no banco de dados
+          description: Erro ao salvar usuário no banco de dados
           schema:
             additionalProperties: true
             type: object
-      summary: Cria uma nova equipe
+      summary: Cria um novo usuário
       tags:
-      - Equipes
-  /equipe/{id}:
+      - Usuários
+  /usuarios/{email}:
+    get:
+      consumes:
+      - application/json
+      description: Busca um usuário pelo e-mail informado
+      parameters:
+      - description: E-mail do usuário
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Usuario'
+        "404":
+          description: Usuário não encontrado
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Exibe um usuário pelo e-mail
+      tags:
+      - Usuários
+  /usuarios/{id}:
     delete:
       consumes:
       - application/json
-      description: Remove uma equipe do sistema pelo ID informado
+      description: Remove um usuário do sistema pelo ID
       parameters:
-      - description: ID da equipe
+      - description: ID do usuário
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: Equipe deletada com sucesso
+          description: Usuário deletado com sucesso
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Equipe não encontrada
+          description: Usuário não encontrado
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Falha ao deletar a equipe
+          description: Erro ao deletar o usuário
           schema:
             additionalProperties: true
             type: object
-      summary: Deleta uma equipe por ID
+      summary: Deleta um usuário
       tags:
-      - Equipes
-    get:
+      - Usuários
+    put:
       consumes:
       - application/json
-      description: Busca uma equipe pelo ID informado
+      description: Atualiza os dados de um usuário existente pelo ID
       parameters:
-      - description: ID da equipe
+      - description: ID do usuário
         in: path
         name: id
         required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Equipe'
-        "404":
-          description: Equipe não encontrada
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Exibe uma equipe por ID
-      tags:
-      - Equipes
-    patch:
-      consumes:
-      - application/json
-      description: Atualiza os dados de uma equipe existente pelo ID
-      parameters:
-      - description: ID da equipe
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Dados atualizados da equipe
+        type: integer
+      - description: Novos dados do usuário
         in: body
-        name: equipe
+        name: usuario
         required: true
         schema:
-          $ref: '#/definitions/models.Equipe'
+          $ref: '#/definitions/models.Usuario'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Equipe'
+            $ref: '#/definitions/models.Usuario'
         "400":
           description: Dados inválidos para atualização
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Equipe não encontrada
+          description: Usuário não encontrado
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Falha ao atualizar a equipe
+          description: Erro ao atualizar o usuário
           schema:
             additionalProperties: true
             type: object
-      summary: Atualiza uma equipe
+      summary: Atualiza os dados de um usuário
       tags:
-      - Equipes
-  /equipes:
+      - Usuários
+  /vagas:
     get:
       consumes:
       - application/json
-      description: Retorna uma lista de todas as equipes cadastradas
+      description: Retorna uma lista de todas as vagas cadastradas no sistema
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Lista de vagas
           schema:
             items:
-              $ref: '#/definitions/models.Equipe'
+              $ref: '#/definitions/models.Vaga'
             type: array
-      summary: Exibe todas as equipes
-      tags:
-      - Equipes
-  /lider:
-    post:
-      consumes:
-      - application/json
-      description: Cadastra um novo líder no sistema
-      parameters:
-      - description: Dados do líder
-        in: body
-        name: lider
-        required: true
-        schema:
-          $ref: '#/definitions/models.Lider'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Lider'
-        "400":
-          description: Falha ao cadastrar líder
+        "500":
+          description: Erro ao listar vagas
           schema:
             additionalProperties: true
             type: object
-      summary: Cria um novo líder
+      summary: Lista todas as vagas
       tags:
-      - Líderes
-  /lider/{cpf}:
+      - Vagas
+    post:
+      consumes:
+      - application/json
+      description: Cadastra uma nova vaga no sistema
+      parameters:
+      - description: Dados da vaga
+        in: body
+        name: vaga
+        required: true
+        schema:
+          $ref: '#/definitions/models.Vaga'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Vaga'
+        "400":
+          description: Falha ao cadastrar vaga
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Erro ao salvar vaga no banco de dados
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Cria uma nova vaga
+      tags:
+      - Vagas
+  /vagas/{id}:
     delete:
       consumes:
       - application/json
-      description: Remove um líder do sistema pelo CPF informado
+      description: Remove uma vaga do sistema pelo ID
       parameters:
-      - description: CPF do líder
+      - description: ID da vaga
         in: path
-        name: cpf
+        name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: Líder deletado com sucesso
+          description: Vaga deletada com sucesso
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Líder não encontrado
+          description: Vaga não encontrada
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Falha ao deletar o líder
+          description: Erro ao deletar a vaga
           schema:
             additionalProperties: true
             type: object
-      summary: Deleta um líder por CPF
+      summary: Deleta uma vaga
       tags:
-      - Líderes
+      - Vagas
     get:
       consumes:
       - application/json
-      description: Busca um líder pelo CPF informado
+      description: Busca uma vaga pelo ID informado
       parameters:
-      - description: CPF do líder
+      - description: ID da vaga
         in: path
-        name: cpf
+        name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Lider'
+            $ref: '#/definitions/models.Vaga'
         "404":
-          description: Líder não encontrado
+          description: Vaga não encontrada
           schema:
             additionalProperties: true
             type: object
-      summary: Exibe um líder por CPF
+      summary: Exibe uma vaga pelo ID
       tags:
-      - Líderes
-    patch:
+      - Vagas
+    put:
       consumes:
       - application/json
-      description: Atualiza os dados de um líder existente pelo CPF
+      description: Atualiza os dados de uma vaga existente pelo ID
       parameters:
-      - description: CPF do líder
+      - description: ID da vaga
         in: path
-        name: cpf
+        name: id
         required: true
-        type: string
-      - description: Dados atualizados do líder
+        type: integer
+      - description: Novos dados da vaga
         in: body
-        name: lider
+        name: vaga
         required: true
         schema:
-          $ref: '#/definitions/models.Lider'
+          $ref: '#/definitions/models.Vaga'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Lider'
+            $ref: '#/definitions/models.Vaga'
         "400":
           description: Dados inválidos para atualização
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Líder não encontrado
+          description: Vaga não encontrada
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Falha ao atualizar o líder
+          description: Erro ao atualizar a vaga
           schema:
             additionalProperties: true
             type: object
-      summary: Atualiza um líder
+      summary: Atualiza os dados de uma vaga
       tags:
-      - Líderes
-  /lideres:
+      - Vagas
+  /vagas/cnpj/{cnpj}:
     get:
       consumes:
       - application/json
-      description: Retorna uma lista de todos os líderes cadastrados
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Lider'
-            type: array
-      summary: Exibe todos os líderes
-      tags:
-      - Líderes
-  /pergunta/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Busca uma pergunta pelo ID informado
+      description: Retorna uma lista de todas as vagas associadas ao CNPJ da empresa
       parameters:
-      - description: ID da pergunta
+      - description: CNPJ da empresa
         in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Pergunta'
-        "404":
-          description: Pergunta não encontrada
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Exibe uma pergunta por ID
-      tags:
-      - Perguntas
-  /pergunta/{id}/respostas:
-    get:
-      consumes:
-      - application/json
-      description: Busca uma pergunta com todas as respostas associadas pelo ID informado
-      parameters:
-      - description: ID da pergunta
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Pergunta'
-        "404":
-          description: Pergunta não encontrada
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Exibe uma pergunta com suas respostas
-      tags:
-      - Perguntas
-  /perguntas:
-    get:
-      consumes:
-      - application/json
-      description: Retorna uma lista de todas as perguntas cadastradas
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Pergunta'
-            type: array
-      summary: Exibe todas as perguntas
-      tags:
-      - Perguntas
-  /perguntas/respostas:
-    get:
-      consumes:
-      - application/json
-      description: Busca todas as perguntas com suas respostas associadas
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Pergunta'
-            type: array
-        "500":
-          description: Erro ao buscar perguntas
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Exibe todas as perguntas com suas respostas
-      tags:
-      - Perguntas
-  /resposta/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Busca uma resposta pelo ID informado
-      parameters:
-      - description: ID da resposta
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Resposta'
-        "404":
-          description: Resposta não encontrada
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Exibe uma resposta por ID
-      tags:
-      - Respostas
-  /respostas:
-    get:
-      consumes:
-      - application/json
-      description: Retorna uma lista de todas as respostas cadastradas
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Resposta'
-            type: array
-      summary: Exibe todas as respostas
-      tags:
-      - Respostas
-  /resultado:
-    post:
-      consumes:
-      - application/json
-      description: Cadastra um novo resultado no sistema
-      parameters:
-      - description: Dados do resultado
-        in: body
-        name: resultado
-        required: true
-        schema:
-          $ref: '#/definitions/models.Resultado'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Resultado'
-        "400":
-          description: Falha ao cadastrar resultado
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Falha ao criar resultado
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Cria um novo resultado
-      tags:
-      - Resultados
-  /resultados/{cpf}:
-    get:
-      consumes:
-      - application/json
-      description: Busca todos os resultados associados ao CPF informado
-      parameters:
-      - description: CPF do atleta
-        in: path
-        name: cpf
+        name: cnpj
         required: true
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Lista de vagas associadas ao CNPJ
           schema:
             items:
-              $ref: '#/definitions/models.Resultado'
+              $ref: '#/definitions/models.Vaga'
             type: array
         "404":
-          description: Resultados não encontrados
+          description: Nenhuma vaga encontrada para o CNPJ
           schema:
             additionalProperties: true
             type: object
-      summary: Exibe resultados por CPF
+        "500":
+          description: Erro ao listar vagas
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Lista todas as vagas associadas a um CNPJ
       tags:
-      - Resultados
+      - Vagas
 swagger: "2.0"

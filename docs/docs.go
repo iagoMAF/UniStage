@@ -15,9 +15,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin": {
-            "post": {
-                "description": "Cadastra um novo administrador no sistema",
+        "/empresas": {
+            "get": {
+                "description": "Retorna uma lista de todas as empresas cadastradas no sistema",
                 "consumes": [
                     "application/json"
                 ],
@@ -25,17 +25,55 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Administradores"
+                    "Empresas"
                 ],
-                "summary": "Cria um novo administrador",
+                "summary": "Lista todas as empresas",
+                "responses": {
+                    "200": {
+                        "description": "Lista de empresas",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Empresa"
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Nenhuma empresa cadastrada",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao listar empresas",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cadastra uma nova empresa no sistema",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresas"
+                ],
+                "summary": "Cria uma nova empresa",
                 "parameters": [
                     {
-                        "description": "Dados do administrador",
-                        "name": "admin",
+                        "description": "Dados da empresa",
+                        "name": "empresa",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Admin"
+                            "$ref": "#/definitions/models.Empresa"
                         }
                     }
                 ],
@@ -43,18 +81,18 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Admin"
+                            "$ref": "#/definitions/models.Empresa"
                         }
                     },
                     "400": {
-                        "description": "Falha ao cadastrar administrador",
+                        "description": "Falha ao cadastrar empresa",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Falha ao salvar administrador no banco de dados",
+                        "description": "Erro ao salvar empresa no banco de dados",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -63,9 +101,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/{login}": {
+        "/empresas/nome/{nome}": {
             "get": {
-                "description": "Busca um administrador pelo login informado",
+                "description": "Retorna os dados de uma empresa com base no nome",
                 "consumes": [
                     "application/json"
                 ],
@@ -73,14 +111,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Administradores"
+                    "Empresas"
                 ],
-                "summary": "Exibe um administrador por login",
+                "summary": "Exibe informações de uma empresa pelo nome",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Login do administrador",
-                        "name": "login",
+                        "description": "Nome da empresa",
+                        "name": "nome",
                         "in": "path",
                         "required": true
                     }
@@ -89,11 +127,110 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Admin"
+                            "$ref": "#/definitions/models.Empresa"
                         }
                     },
                     "404": {
-                        "description": "Administrador não encontrado",
+                        "description": "Empresa não encontrada",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/empresas/{cnpj}": {
+            "get": {
+                "description": "Busca uma empresa pelo CNPJ informado",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresas"
+                ],
+                "summary": "Exibe uma empresa pelo CNPJ",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CNPJ da empresa",
+                        "name": "cnpj",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Empresa"
+                        }
+                    },
+                    "404": {
+                        "description": "Empresa não encontrada",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza as informações de uma empresa no sistema",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresas"
+                ],
+                "summary": "Altera os dados de uma empresa existente",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CNPJ da empresa",
+                        "name": "cnpj",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados da empresa",
+                        "name": "empresa",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Empresa"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Empresa"
+                        }
+                    },
+                    "400": {
+                        "description": "Falha ao processar os dados da empresa",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Empresa não encontrada",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao atualizar a empresa",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -102,7 +239,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Remove um administrador do sistema pelo login informado",
+                "description": "Exclui uma empresa do sistema pelo CNPJ",
                 "consumes": [
                     "application/json"
                 ],
@@ -110,35 +247,35 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Administradores"
+                    "Empresas"
                 ],
-                "summary": "Deleta um administrador por login",
+                "summary": "Deleta uma empresa",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Login do administrador",
-                        "name": "login",
+                        "description": "CNPJ da empresa",
+                        "name": "cnpj",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Administrador deletado com sucesso",
+                        "description": "Empresa excluída com sucesso",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Administrador não encontrado",
+                        "description": "Empresa não encontrada",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Falha ao deletar o administrador",
+                        "description": "Erro ao deletar a empresa",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -147,114 +284,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/{login}/senha": {
-            "patch": {
-                "description": "Atualiza a senha de um administrador existente pelo login",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Administradores"
-                ],
-                "summary": "Atualiza a senha de um administrador",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Login do administrador",
-                        "name": "login",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Nova senha",
-                        "name": "senha",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Admin"
-                        }
-                    },
-                    "400": {
-                        "description": "Dados inválidos para atualização",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Administrador não encontrado",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Falha ao atualizar a senha do administrador",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/atleta": {
-            "post": {
-                "description": "Cadastra um novo atleta no sistema",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Atletas"
-                ],
-                "summary": "Cria um novo atleta",
-                "parameters": [
-                    {
-                        "description": "Dados do atleta",
-                        "name": "atleta",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Atleta"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Atleta"
-                        }
-                    },
-                    "400": {
-                        "description": "Falha ao cadastrar atleta",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/atleta/{cpf}": {
+        "/usuarios": {
             "get": {
-                "description": "Busca um atleta pelo CPF informado",
+                "description": "Retorna uma lista de todos os usuários cadastrados no sistema",
                 "consumes": [
                     "application/json"
                 ],
@@ -262,211 +294,37 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Atletas"
+                    "Usuários"
                 ],
-                "summary": "Exibe um atleta por CPF",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "CPF do atleta",
-                        "name": "cpf",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
+                "summary": "Lista todos os usuários",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Lista de usuários",
                         "schema": {
-                            "$ref": "#/definitions/models.Atleta"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Usuario"
+                            }
                         }
                     },
-                    "404": {
-                        "description": "Atleta não encontrado",
+                    "201": {
+                        "description": "Nenhum usuário cadastrado",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao listar usuários",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
             },
-            "patch": {
-                "description": "Atualiza os dados de um atleta existente pelo CPF",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Atletas"
-                ],
-                "summary": "Atualiza um atleta",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "CPF do atleta",
-                        "name": "cpf",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Dados atualizados do atleta",
-                        "name": "atleta",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Atleta"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Atleta"
-                        }
-                    },
-                    "400": {
-                        "description": "Dados inválidos para atualização",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Atleta não encontrado",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/atletas": {
-            "get": {
-                "description": "Retorna uma lista de todos os atletas cadastrados",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Atletas"
-                ],
-                "summary": "Exibe todos os atletas",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Atleta"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/atletas/equipe/{id_equipe}": {
-            "get": {
-                "description": "Retorna uma lista de atletas associados à equipe especificada pelo ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Atletas"
-                ],
-                "summary": "Exibe todos os atletas associados a uma equipe",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID da equipe",
-                        "name": "id_equipe",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Atleta"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Nenhum atleta encontrado para a equipe informada",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/atletas/lider/{cpf_lider}": {
-            "get": {
-                "description": "Retorna uma lista de atletas associados ao líder especificado pelo CPF",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Atletas"
-                ],
-                "summary": "Exibe todos os atletas associados a um líder",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "CPF do líder",
-                        "name": "cpf_lider",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Atleta"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Nenhum atleta encontrado para o líder informado",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/equipe": {
             "post": {
-                "description": "Cadastra uma nova equipe no sistema",
+                "description": "Cadastra um novo usuário no sistema",
                 "consumes": [
                     "application/json"
                 ],
@@ -474,17 +332,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Equipes"
+                    "Usuários"
                 ],
-                "summary": "Cria uma nova equipe",
+                "summary": "Cria um novo usuário",
                 "parameters": [
                     {
-                        "description": "Dados da equipe",
-                        "name": "equipe",
+                        "description": "Dados do usuário",
+                        "name": "usuario",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Equipe"
+                            "$ref": "#/definitions/models.Usuario"
                         }
                     }
                 ],
@@ -492,18 +350,18 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Equipe"
+                            "$ref": "#/definitions/models.Usuario"
                         }
                     },
                     "400": {
-                        "description": "Falha ao cadastrar equipe",
+                        "description": "Falha ao cadastrar usuário",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Falha ao salvar equipe no banco de dados",
+                        "description": "Erro ao salvar usuário no banco de dados",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -512,9 +370,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/equipe/{id}": {
+        "/usuarios/{email}": {
             "get": {
-                "description": "Busca uma equipe pelo ID informado",
+                "description": "Busca um usuário pelo e-mail informado",
                 "consumes": [
                     "application/json"
                 ],
@@ -522,14 +380,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Equipes"
+                    "Usuários"
                 ],
-                "summary": "Exibe uma equipe por ID",
+                "summary": "Exibe um usuário pelo e-mail",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID da equipe",
-                        "name": "id",
+                        "description": "E-mail do usuário",
+                        "name": "email",
                         "in": "path",
                         "required": true
                     }
@@ -538,11 +396,73 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Equipe"
+                            "$ref": "#/definitions/models.Usuario"
                         }
                     },
                     "404": {
-                        "description": "Equipe não encontrada",
+                        "description": "Usuário não encontrado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/usuarios/{id}": {
+            "put": {
+                "description": "Atualiza os dados de um usuário existente pelo ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Usuários"
+                ],
+                "summary": "Atualiza os dados de um usuário",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do usuário",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Novos dados do usuário",
+                        "name": "usuario",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Usuario"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Usuario"
+                        }
+                    },
+                    "400": {
+                        "description": "Dados inválidos para atualização",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao atualizar o usuário",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -551,7 +471,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Remove uma equipe do sistema pelo ID informado",
+                "description": "Remove um usuário do sistema pelo ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -559,13 +479,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Equipes"
+                    "Usuários"
                 ],
-                "summary": "Deleta uma equipe por ID",
+                "summary": "Deleta um usuário",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "ID da equipe",
+                        "type": "integer",
+                        "description": "ID do usuário",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -573,21 +493,54 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Equipe deletada com sucesso",
+                        "description": "Usuário deletado com sucesso",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Equipe não encontrada",
+                        "description": "Usuário não encontrado",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Falha ao deletar a equipe",
+                        "description": "Erro ao deletar o usuário",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/vagas": {
+            "get": {
+                "description": "Retorna uma lista de todas as vagas cadastradas no sistema",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vagas"
+                ],
+                "summary": "Lista todas as vagas",
+                "responses": {
+                    "200": {
+                        "description": "Lista de vagas",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Vaga"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao listar vagas",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -595,8 +548,8 @@ const docTemplate = `{
                     }
                 }
             },
-            "patch": {
-                "description": "Atualiza os dados de uma equipe existente pelo ID",
+            "post": {
+                "description": "Cadastra uma nova vaga no sistema",
                 "consumes": [
                     "application/json"
                 ],
@@ -604,24 +557,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Equipes"
+                    "Vagas"
                 ],
-                "summary": "Atualiza uma equipe",
+                "summary": "Cria uma nova vaga",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "ID da equipe",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Dados atualizados da equipe",
-                        "name": "equipe",
+                        "description": "Dados da vaga",
+                        "name": "vaga",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Equipe"
+                            "$ref": "#/definitions/models.Vaga"
                         }
                     }
                 ],
@@ -629,7 +575,148 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Equipe"
+                            "$ref": "#/definitions/models.Vaga"
+                        }
+                    },
+                    "400": {
+                        "description": "Falha ao cadastrar vaga",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao salvar vaga no banco de dados",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/vagas/cnpj/{cnpj}": {
+            "get": {
+                "description": "Retorna uma lista de todas as vagas associadas ao CNPJ da empresa",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vagas"
+                ],
+                "summary": "Lista todas as vagas associadas a um CNPJ",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CNPJ da empresa",
+                        "name": "cnpj",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de vagas associadas ao CNPJ",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Vaga"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nenhuma vaga encontrada para o CNPJ",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao listar vagas",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/vagas/{id}": {
+            "get": {
+                "description": "Busca uma vaga pelo ID informado",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vagas"
+                ],
+                "summary": "Exibe uma vaga pelo ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da vaga",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Vaga"
+                        }
+                    },
+                    "404": {
+                        "description": "Vaga não encontrada",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de uma vaga existente pelo ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vagas"
+                ],
+                "summary": "Atualiza os dados de uma vaga",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da vaga",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Novos dados da vaga",
+                        "name": "vaga",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Vaga"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Vaga"
                         }
                     },
                     "400": {
@@ -640,120 +727,14 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Equipe não encontrada",
+                        "description": "Vaga não encontrada",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Falha ao atualizar a equipe",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/equipes": {
-            "get": {
-                "description": "Retorna uma lista de todas as equipes cadastradas",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Equipes"
-                ],
-                "summary": "Exibe todas as equipes",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Equipe"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/lider": {
-            "post": {
-                "description": "Cadastra um novo líder no sistema",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Líderes"
-                ],
-                "summary": "Cria um novo líder",
-                "parameters": [
-                    {
-                        "description": "Dados do líder",
-                        "name": "lider",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Lider"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Lider"
-                        }
-                    },
-                    "400": {
-                        "description": "Falha ao cadastrar líder",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/lider/{cpf}": {
-            "get": {
-                "description": "Busca um líder pelo CPF informado",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Líderes"
-                ],
-                "summary": "Exibe um líder por CPF",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "CPF do líder",
-                        "name": "cpf",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Lider"
-                        }
-                    },
-                    "404": {
-                        "description": "Líder não encontrado",
+                        "description": "Erro ao atualizar a vaga",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -762,7 +743,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Remove um líder do sistema pelo CPF informado",
+                "description": "Remove uma vaga do sistema pelo ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -770,146 +751,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Líderes"
+                    "Vagas"
                 ],
-                "summary": "Deleta um líder por CPF",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "CPF do líder",
-                        "name": "cpf",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Líder deletado com sucesso",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Líder não encontrado",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Falha ao deletar o líder",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "patch": {
-                "description": "Atualiza os dados de um líder existente pelo CPF",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Líderes"
-                ],
-                "summary": "Atualiza um líder",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "CPF do líder",
-                        "name": "cpf",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Dados atualizados do líder",
-                        "name": "lider",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Lider"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Lider"
-                        }
-                    },
-                    "400": {
-                        "description": "Dados inválidos para atualização",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Líder não encontrado",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Falha ao atualizar o líder",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/lideres": {
-            "get": {
-                "description": "Retorna uma lista de todos os líderes cadastrados",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Líderes"
-                ],
-                "summary": "Exibe todos os líderes",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Lider"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/pergunta/{id}": {
-            "get": {
-                "description": "Busca uma pergunta pelo ID informado",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Perguntas"
-                ],
-                "summary": "Exibe uma pergunta por ID",
+                "summary": "Deleta uma vaga",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID da pergunta",
+                        "description": "ID da vaga",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -917,266 +765,21 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Vaga deletada com sucesso",
                         "schema": {
-                            "$ref": "#/definitions/models.Pergunta"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Pergunta não encontrada",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/pergunta/{id}/respostas": {
-            "get": {
-                "description": "Busca uma pergunta com todas as respostas associadas pelo ID informado",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Perguntas"
-                ],
-                "summary": "Exibe uma pergunta com suas respostas",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID da pergunta",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Pergunta"
-                        }
-                    },
-                    "404": {
-                        "description": "Pergunta não encontrada",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/perguntas": {
-            "get": {
-                "description": "Retorna uma lista de todas as perguntas cadastradas",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Perguntas"
-                ],
-                "summary": "Exibe todas as perguntas",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Pergunta"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/perguntas/respostas": {
-            "get": {
-                "description": "Busca todas as perguntas com suas respostas associadas",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Perguntas"
-                ],
-                "summary": "Exibe todas as perguntas com suas respostas",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Pergunta"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erro ao buscar perguntas",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/resposta/{id}": {
-            "get": {
-                "description": "Busca uma resposta pelo ID informado",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Respostas"
-                ],
-                "summary": "Exibe uma resposta por ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID da resposta",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Resposta"
-                        }
-                    },
-                    "404": {
-                        "description": "Resposta não encontrada",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/respostas": {
-            "get": {
-                "description": "Retorna uma lista de todas as respostas cadastradas",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Respostas"
-                ],
-                "summary": "Exibe todas as respostas",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Resposta"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/resultado": {
-            "post": {
-                "description": "Cadastra um novo resultado no sistema",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Resultados"
-                ],
-                "summary": "Cria um novo resultado",
-                "parameters": [
-                    {
-                        "description": "Dados do resultado",
-                        "name": "resultado",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Resultado"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Resultado"
-                        }
-                    },
-                    "400": {
-                        "description": "Falha ao cadastrar resultado",
+                        "description": "Vaga não encontrada",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Falha ao criar resultado",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/resultados/{cpf}": {
-            "get": {
-                "description": "Busca todos os resultados associados ao CPF informado",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Resultados"
-                ],
-                "summary": "Exibe resultados por CPF",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "CPF do atleta",
-                        "name": "cpf",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Resultado"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Resultados não encontrados",
+                        "description": "Erro ao deletar a vaga",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1187,212 +790,147 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.Admin": {
-            "description": "Representa um administrador do sistema",
+        "models.Empresa": {
+            "description": "Representa uma empresa cadastrada no sistema",
             "type": "object",
             "properties": {
-                "login": {
+                "area_de_atuacao": {
                     "type": "string"
                 },
-                "senha": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Atleta": {
-            "description": "Representa um atleta com informações básicas.",
-            "type": "object",
-            "properties": {
                 "ativo": {
-                    "description": "Status ativo do atleta",
-                    "type": "integer"
+                    "type": "boolean"
                 },
-                "cpf": {
-                    "description": "CPF do atleta",
+                "bairro": {
                     "type": "string"
                 },
-                "cpf_lider": {
-                    "description": "CPF do líder associado",
+                "cidade": {
                     "type": "string"
                 },
-                "createdAt": {
-                    "description": "Data de criação",
+                "cnpj": {
                     "type": "string"
                 },
-                "deletedAt": {
-                    "description": "Data de exclusão (opcional)",
+                "data_cadastro": {
+                    "type": "string"
+                },
+                "descricao": {
                     "type": "string"
                 },
                 "email": {
-                    "description": "Email do atleta",
                     "type": "string"
                 },
-                "equipe": {
-                    "description": "Relacionamento com o modelo Equipe",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.Equipe"
-                        }
-                    ]
-                },
-                "funcao": {
-                    "description": "Função do atleta",
+                "logradouro": {
                     "type": "string"
                 },
-                "id": {
-                    "description": "ID do atleta",
-                    "type": "integer"
-                },
-                "id_equipe": {
-                    "description": "ID da equipe associada",
-                    "type": "integer"
-                },
-                "idade": {
-                    "description": "Idade do atleta",
-                    "type": "integer"
-                },
-                "lider": {
-                    "description": "Relacionamento com o modelo Lider",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.Lider"
-                        }
-                    ]
-                },
-                "nome": {
-                    "description": "Nome do atleta",
+                "nome_fantasia": {
                     "type": "string"
                 },
-                "senha": {
-                    "description": "Senha do atleta",
+                "numero": {
                     "type": "string"
                 },
-                "updatedAt": {
-                    "description": "Data de atualização",
+                "razao_social": {
+                    "type": "string"
+                },
+                "telefone": {
+                    "type": "string"
+                },
+                "uf": {
+                    "type": "string"
+                },
+                "website": {
                     "type": "string"
                 }
             }
         },
-        "models.Equipe": {
-            "description": "Representa uma equipe com informações básicas.",
+        "models.Usuario": {
+            "description": "Representa um usuário do sistema",
             "type": "object",
             "properties": {
                 "ativo": {
-                    "description": "Status ativo da equipe",
-                    "type": "integer"
+                    "type": "boolean"
                 },
-                "createdAt": {
-                    "description": "Data de criação",
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "description": "Data de exclusão (opcional)",
-                    "type": "string"
-                },
-                "id": {
-                    "description": "ID da equipe",
-                    "type": "integer"
-                },
-                "nome": {
-                    "description": "Nome da equipe",
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "description": "Data de atualização",
-                    "type": "string"
-                }
-            }
-        },
-        "models.Lider": {
-            "description": "Representa um líder com informações básicas.",
-            "type": "object",
-            "properties": {
-                "cpf": {
-                    "description": "CPF do líder",
-                    "type": "string"
-                },
-                "createdAt": {
-                    "description": "Data de criação",
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "description": "Data de exclusão (opcional)",
+                "data_cadastro": {
                     "type": "string"
                 },
                 "email": {
-                    "description": "Email do líder",
                     "type": "string"
                 },
+                "empresa_cnpj": {
+                    "description": "Chave estrangeira opcional",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
                 "nome": {
-                    "description": "Nome do líder",
                     "type": "string"
                 },
                 "senha": {
-                    "description": "Senha do líder",
                     "type": "string"
                 },
-                "updatedAt": {
-                    "description": "Data de atualização",
-                    "type": "string"
+                "tipo_usuario": {
+                    "description": "true = ADMIN, false = EMPRESA",
+                    "type": "boolean"
                 }
             }
         },
-        "models.Pergunta": {
-            "description": "Representa uma pergunta com um conjunto de respostas.",
+        "models.Vaga": {
+            "description": "Representa uma vaga de emprego ou estágio no sistema",
             "type": "object",
             "properties": {
-                "id": {
-                    "description": "ID da pergunta",
+                "ativo": {
+                    "type": "boolean"
+                },
+                "bairro": {
+                    "type": "string"
+                },
+                "beneficios": {
+                    "type": "string"
+                },
+                "carga_horaria": {
+                    "type": "string"
+                },
+                "cidade": {
+                    "type": "string"
+                },
+                "conhecimento_dif": {
+                    "type": "string"
+                },
+                "data_expiracao": {
+                    "type": "string"
+                },
+                "data_publicacao": {
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "empresa_cnpj": {
+                    "description": "Chave estrangeira para Empresa",
+                    "type": "string"
+                },
+                "estagio_remoto": {
+                    "description": "0 = Presencial, 1 = Remoto, 2 = Híbrido",
                     "type": "integer"
                 },
-                "pergunta": {
-                    "description": "Texto da pergunta",
-                    "type": "string"
-                },
-                "respostas": {
-                    "description": "Respostas associadas",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Resposta"
-                    }
-                }
-            }
-        },
-        "models.Resposta": {
-            "description": "Representa uma resposta associada a uma pergunta.",
-            "type": "object",
-            "properties": {
                 "id": {
-                    "description": "ID da resposta",
                     "type": "integer"
                 },
-                "pergunta_id": {
-                    "description": "ID da pergunta associada",
-                    "type": "integer"
-                },
-                "resposta": {
-                    "description": "Texto da resposta",
-                    "type": "string"
-                }
-            }
-        },
-        "models.Resultado": {
-            "description": "Resultado representa o modelo de um resultado de desempenho com informações do atleta e os dados de resultado",
-            "type": "object",
-            "properties": {
-                "cpf": {
+                "logradouro": {
                     "type": "string"
                 },
-                "data": {
+                "numero": {
                     "type": "string"
                 },
-                "eixo_x": {
+                "remuneracao": {
                     "type": "string"
                 },
-                "eixo_y": {
+                "requisitos": {
                     "type": "string"
                 },
-                "id": {
+                "titulo": {
+                    "type": "string"
+                },
+                "uf": {
                     "type": "string"
                 }
             }
