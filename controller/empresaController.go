@@ -31,7 +31,24 @@ func CriaEmpresa(c *gin.Context) {
 		return
 	}
 
-	// Configura a data de cadastro automaticamente
+	var existingCNPJ models.Empresa
+	if err := database.DB.Where("cnpj = ?", empresa.CNPJ).First(&existingCNPJ).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"error":  "CNPJ já cadastrado",
+			"status": 400,
+		})
+		return
+	}
+
+	var existingEmail models.Empresa
+	if err := database.DB.Where("email = ?", empresa.Email).First(&existingEmail).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"error":  "E-mail já cadastrado",
+			"status": 409,
+		})
+		return
+	}
+
 	empresa.DataCadastro = time.Now()
 
 	if err := database.DB.Create(&empresa).Error; err != nil {

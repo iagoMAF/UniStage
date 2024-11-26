@@ -31,7 +31,16 @@ func CriaUsuario(c *gin.Context) {
 		return
 	}
 
-	// Configura a data de cadastro automaticamente
+	var existeUsuario models.Usuario
+
+	if err := database.DB.Where("email = ?", usuario.Email).First(&existeUsuario).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"error":  "E-mail já cadastrado",
+			"status": 409,
+		})
+		return
+	}
+
 	usuario.DataCadastro = time.Now()
 
 	if err := database.DB.Create(&usuario).Error; err != nil {
