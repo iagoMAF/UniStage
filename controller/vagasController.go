@@ -18,6 +18,7 @@ import (
 // @Param vaga body models.Vaga true "Dados da vaga"
 // @Success 200 {object} models.Vaga
 // @Failure 400 {object} map[string]interface{} "Falha ao cadastrar vaga"
+// @Failure 409 {object} map[string]interface{} "CNPJ da empresa não encontrado"
 // @Failure 500 {object} map[string]interface{} "Erro ao salvar vaga no banco de dados"
 // @Router /vagas [post]
 func CriaVaga(c *gin.Context) {
@@ -27,6 +28,15 @@ func CriaVaga(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":  "Falha ao processar os dados da vaga",
 			"status": 400,
+		})
+		return
+	}
+
+	var empresa models.Empresa
+	if err := database.DB.Where("cnpj = ?", vaga.EmpresaCNPJ).First(&empresa).Error; err != nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"error":  "CNPJ da empresa não encontrado",
+			"status": 409,
 		})
 		return
 	}
