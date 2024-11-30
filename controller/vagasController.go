@@ -23,7 +23,6 @@ import (
 func CriaVaga(c *gin.Context) {
 	var vaga models.Vaga
 
-	// Verifica e faz o binding dos dados JSON recebidos
 	if err := c.ShouldBindJSON(&vaga); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":  "Falha ao processar os dados da vaga",
@@ -32,7 +31,6 @@ func CriaVaga(c *gin.Context) {
 		return
 	}
 
-	// Configura a data de publicação automaticamente
 	vaga.DataPublicacao = time.Now()
 
 	if err := database.DB.Create(&vaga).Error; err != nil {
@@ -59,7 +57,7 @@ func ExibeVagaPorID(c *gin.Context) {
 	var vaga models.Vaga
 	id := c.Param("id")
 
-	result := database.DB.First(&vaga, id)
+	result := database.DB.Preload("Empresa").First(&vaga, id)
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error":  "Vaga não encontrada",
@@ -97,7 +95,6 @@ func AtualizaVaga(c *gin.Context) {
 		return
 	}
 
-	// Faz o binding dos dados do JSON
 	if err := c.ShouldBindJSON(&vaga); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":  "Dados inválidos para atualização",
@@ -106,7 +103,6 @@ func AtualizaVaga(c *gin.Context) {
 		return
 	}
 
-	// Atualiza os dados da vaga no banco
 	if err := database.DB.Save(&vaga).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erro ao atualizar a vaga",
@@ -132,7 +128,6 @@ func DeletaVaga(c *gin.Context) {
 	var vaga models.Vaga
 	id := c.Param("id")
 
-	// Verifica se a vaga existe
 	result := database.DB.First(&vaga, id)
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{
@@ -142,7 +137,6 @@ func DeletaVaga(c *gin.Context) {
 		return
 	}
 
-	// Deleta a vaga
 	if err := database.DB.Delete(&vaga).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erro ao deletar a vaga",
@@ -167,8 +161,7 @@ func DeletaVaga(c *gin.Context) {
 func ListaVagas(c *gin.Context) {
 	var vagas []models.Vaga
 
-	// Recupera todas as vagas cadastradas
-	if err := database.DB.Find(&vagas).Error; err != nil {
+	if err := database.DB.Preload("Empresa").Find(&vagas).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erro ao listar vagas",
 		})
@@ -201,15 +194,13 @@ func ListaVagasPorCNPJ(c *gin.Context) {
 
 	var vagas []models.Vaga
 
-	// Filtra as vagas pelo CNPJ da empresa
-	if err := database.DB.Where("empresa_cnpj = ?", cnpj).Find(&vagas).Error; err != nil {
+	if err := database.DB.Preload("Empresa").Where("empresa_cnpj = ?", cnpj).Find(&vagas).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erro ao listar vagas",
 		})
 		return
 	}
 
-	// Se não encontrar nenhuma vaga associada ao CNPJ
 	if len(vagas) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error":  "Nenhuma vaga encontrada para o CNPJ",
@@ -218,6 +209,40 @@ func ListaVagasPorCNPJ(c *gin.Context) {
 		return
 	}
 
-	// Retorna as vagas encontradas
 	c.JSON(http.StatusOK, vagas)
+}
+
+// ExibeVagaComEmpresa godoc
+// @Summary Exibe uma vaga pelo ID com a empresa associada
+// @Description Busca uma vaga pelo ID e carrega a empresa associada
+// @Tags Vagas
+// @Accept  json
+// @Produce  json
+// @Param id path int true "ID da vaga"
+// @Success 200 {object} models.Vaga "Vaga com a empresa associada"
+// @Failure 404 {object} map[string]interface{} "Vaga não encontrada"
+// @Failure 500 {object} map[string]interface{} "Erro ao listar vaga"
+// @Router /vagas/empresa/{id} [get]
+func ExibeVagaComEmpresa(c *gin.Context) {
+	var vaga models.Vaga
+	id := c.Param("id")
+
+	result := database.DB.Preload("Empresa").First(&vaga, id)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":  "Vaga não encontrada",
+			"status": 404,
+		})
+		return
+	}
+
+	if vaga.Empresa.CNPJ == "" {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":  "Empresa associada à vaga não encontrada",
+			"status": 404,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, vaga)
 }

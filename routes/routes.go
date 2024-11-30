@@ -48,6 +48,7 @@ func HandleRequest() {
 	//rotas de vagas
 	r.GET("/vagas", controller.ListaVagas)
 	r.GET("/vagas/:id", controller.ExibeVagaPorID)
+	r.GET("/vagas/empresa/:id", controller.ExibeVagaComEmpresa)
 	r.GET("/vagas/cnpj/:cnpj", controller.ListaVagasPorCNPJ)
 	r.PATCH("/vagas/:id", controller.AtualizaVaga)
 	r.POST("/vagas", controller.CriaVaga)
