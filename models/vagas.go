@@ -23,13 +23,13 @@ import (
 // @Property EmpresaCNPJ string "Chave estrangeira para a empresa que criou a vaga"
 // @Property Ativo bool "Indica se a vaga está ativa e visível no sistema"
 // @Property DataPublicacao time.Time "Data e hora de publicação da vaga"
-// @Property DataExpiracao time.Time "Data e hora em que a vaga expira, caso aplicável"
+// @Property DataExpiracao string "Data e hora em que a vaga expira, caso aplicável"
 // @Property Empresa Empresa "Informações sobre a empresa associada à vaga"
 // Vaga model
 type Vaga struct {
 	ID              int        `gorm:"primaryKey;autoIncrement" json:"id"`
 	Titulo          string     `gorm:"type:varchar(255);not null" json:"titulo"`
-	Descricao       string     `gorm:"type:text;not null" json:"descricao"`
+	Descricao       string     `gorm:"type:text;not null" json:"descricao"`	
 	Requisitos      string     `gorm:"type:text" json:"requisitos"`
 	Beneficios      string     `gorm:"type:text" json:"beneficios"`
 	ConhecimentoDif string     `gorm:"type:text" json:"conhecimento_dif"`
@@ -44,7 +44,8 @@ type Vaga struct {
 	EmpresaCNPJ     string     `gorm:"type:varchar(18);not null" json:"empresa_cnpj"`
 	Ativo           bool       `gorm:"default:true" json:"ativo"`
 	DataPublicacao  time.Time  `gorm:"autoCreateTime" json:"data_publicacao"`
-	DataExpiracao   *time.Time `gorm:"type:timestamp" json:"data_expiracao,omitempty"`
+	DataExpiracao   string     `gorm:"type:varchar(255)" json:"data_expiracao"`
+	AreaDeAtuacao   string     `gorm:"type:varchar(255);not null" json:"area_de_atuacao"`
 
 	Empresa Empresa `gorm:"foreignKey:EmpresaCNPJ;references:CNPJ" json:"empresa"`
 }

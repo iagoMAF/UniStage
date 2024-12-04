@@ -6,9 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/iagoMAF/API_JOHARI/controller"
-	"github.com/iagoMAF/API_JOHARI/middleware"
+	// "github.com/iagoMAF/API_JOHARI/middleware"
 
 	"github.com/joho/godotenv"
+
+	"github.com/gin-contrib/cors"
 
 	_ "github.com/iagoMAF/API_JOHARI/docs"
 	swaggerFiles "github.com/swaggo/files"
@@ -26,7 +28,18 @@ func HandleRequest() {
 		port = "8080"
 	}
 
-	r.Use(middleware.AuthMiddleware())
+	// r.Use(middleware.AuthMiddleware())
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		AllowOriginFunc: func(origin string) bool {
+			return origin == "https://github.com"
+		},
+	}))
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

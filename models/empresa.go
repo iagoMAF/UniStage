@@ -37,6 +37,7 @@ type Empresa struct {
 	Numero        string    `gorm:"type:varchar(10);not null" json:"numero"`
 	Bairro        string    `gorm:"type:varchar(255);not null" json:"bairro"`
 	Website       *string   `gorm:"type:varchar(255)" json:"website,omitempty"`
+	Senha         string    `gorm:"type:varchar(255);not null" json:"senha"`
 }
 
 // Tabela auxiliar para armazenar múltiplas empresas
